@@ -16,6 +16,23 @@ log() {
     logger -t monitor_setup "$1"
 }
 
+# Function to create necessary directories
+create_directories() {
+    DIRECTORIES=("/var/log/monitor_setup" $HOME/monitor/graphs $HOME/monitor/logs)
+    for directory in "${DIRECTORIES[@]}"; do
+        if [ ! -d "$directory" ]; then            
+            log "Creating directory: $directory..."
+            sudo mkdir -p "$directory"
+            sudo chown "$USER:$USER" "$directory"
+        else
+            log "Directory $directory already exists."            
+        fi
+    done
+    sudo touch "$LOG_FILE"
+    sudo chown "$USER:$USER" "$LOG_FILE"
+  
+}
+
 # Function to check if a package is installed
 is_package_installed() {
     dpkg -s "$1" &> /dev/null
@@ -23,7 +40,7 @@ is_package_installed() {
 
 # Function to check if a Python package is installed
 is_python_package_installed() {
-    pip3 show"import $1" &> /dev/null 
+    pip3 show "$1" &> /dev/null 
 }
 
 # Function to install system packages 
@@ -67,22 +84,6 @@ install_python_libraries() {
     done
 }
 
-# Function to create necessary directories
-create_directories() {
-    DIRECTORIES=("/var/log/monitor_setup" $HOME/monitor/graphs $HOME/monitor/logs)
-    for directory in "${DIRECTORIES[@]}"; do
-        if [ ! -d "$directory" ]; then            
-            log "Creating directory: $directory..."
-            sudo mkdir -p "$directory"
-            sudo chown "$USER:$USER" "$directory"
-        else
-            log "Directory $directory already exists."            
-        fi
-    done
-    sudo touch "$LOG_FILE"
-    sudo chown "$USER:$USER" "$LOG_FILE"
-  
-}
 
 # Main execution
 log "Starting system setup..."
